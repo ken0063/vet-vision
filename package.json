@@ -35,5 +35,6 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.18",
     "vite": "^7.2.4"
-  }
+  },
+  "packageManager": "yarn@4.9.2+sha256.ca4310f8ba997b4643a000ce512d9772e01c1485df35511114b325315960acb7"
 }

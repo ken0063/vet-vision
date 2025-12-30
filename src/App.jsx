@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useAnalysis } from './hooks/useAnalysis';
 import { useHistory } from './hooks/useHistory';
@@ -17,6 +17,8 @@ import { ActionOverlay } from './components/ActionOverlay';
  */
 const App = () => {
   const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
+  const [permissionDenied, setPermissionDenied] = useState(false);
   
   const { history, loading, hasMore, infiniteScrollRef, refresh } = useHistory();
   
@@ -32,6 +34,30 @@ const App = () => {
   const handleImageSelect = (e) => {
     const file = e.target.files[0];
     if (file) selectImage(file);
+  };
+
+  const handleCameraClick = async () => {
+    try {
+      // Request camera permission
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment' } 
+      });
+      
+      // Permission granted, stop the stream and trigger camera input
+      stream.getTracks().forEach(track => track.stop());
+      setPermissionDenied(false);
+      cameraInputRef.current.click();
+    } catch (error) {
+      console.error('Camera permission denied:', error);
+      setPermissionDenied(true);
+      
+      // Show alert to user
+      alert('Camera permission is required to take photos. Please enable camera access in your browser settings.');
+    }
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current.click();
   };
 
   return (
@@ -59,14 +85,27 @@ const App = () => {
         infiniteScrollRef={infiniteScrollRef}
       />
 
-      <ActionOverlay onFileSelect={() => fileInputRef.current.click()} />
+      <ActionOverlay 
+        onCameraClick={handleCameraClick}
+        onUploadClick={handleUploadClick}
+      />
 
+      {/* Camera input - Opens camera directly */}
+      <input 
+        type="file" 
+        ref={cameraInputRef} 
+        onChange={handleImageSelect} 
+        accept="image/*" 
+        capture="environment"
+        className="hidden" 
+      />
+
+      {/* Upload input - Opens file picker */}
       <input 
         type="file" 
         ref={fileInputRef} 
         onChange={handleImageSelect} 
         accept="image/*" 
-        capture="environment"
         className="hidden" 
       />
     </div>

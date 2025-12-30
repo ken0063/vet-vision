@@ -63,12 +63,24 @@ export const AnalysisCard = ({ previewUrl, result, analyzing, onClear, onRun }) 
       </motion.div>
     )}
 
-    {!result && !analyzing && (
+    {!result && (
       <button 
         onClick={onRun}
-        className="w-full py-4 rounded-2xl bg-primary hover:bg-secondary text-white font-bold shadow-lg shadow-primary/20 transition-all transform active:scale-[0.98]"
+        disabled={analyzing}
+        className={`w-full py-4 rounded-2xl font-bold shadow-lg transition-all transform ${
+          analyzing 
+            ? 'bg-slate-600 cursor-not-allowed' 
+            : 'bg-primary hover:bg-secondary shadow-primary/20 active:scale-[0.98]'
+        } text-white flex items-center justify-center gap-2`}
       >
-        Start AI Analysis
+        {analyzing ? (
+          <>
+            <Loader2 className="w-5 h-5 animate-spin" />
+            <span>Analyzing...</span>
+          </>
+        ) : (
+          'Start AI Analysis'
+        )}
       </button>
     )}
   </motion.div>

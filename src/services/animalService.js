@@ -14,8 +14,17 @@ export const AnimalService = {
       createdAt: serverTimestamp()
     };
     
-    const docRef = await addDoc(collection(db, "animals"), result);
-    return { id: docRef.id, ...result };
+    try {
+      const docRef = await addDoc(collection(db, "animals"), result);
+      console.log("Analysis saved to Firebase with ID:", docRef.id);
+      
+      // Return the analysis with the document ID
+      // Note: createdAt will be filled by Firebase on the server
+      return { id: docRef.id, ...analysis, createdAt: new Date() };
+    } catch (error) {
+      console.error("Error saving to Firebase:", error);
+      throw new Error(`Failed to save analysis: ${error.message}`);
+    }
   },
 
   async getHistory(lastDoc = null, pageSize = 10) {

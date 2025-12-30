@@ -17,13 +17,19 @@ service cloud.firestore {
       // Validate that required fields are present
       allow create: if request.resource.data.keys().hasAll([
         'animal', 
-        'weight', 
-        'confidence', 
+        'breed',
+        'bodyType',
+        'frameType',
+        'estimatedWeight',
+        'weightRange',
         'createdAt'
       ]) 
       && request.resource.data.animal is string
-      && request.resource.data.weight is string
-      && request.resource.data.confidence is string
+      && request.resource.data.breed is string
+      && request.resource.data.bodyType is string
+      && request.resource.data.frameType is string
+      && request.resource.data.estimatedWeight is number
+      && request.resource.data.weightRange is string
       && request.resource.data.createdAt == request.time;
       
       // Prevent updates and deletes for now

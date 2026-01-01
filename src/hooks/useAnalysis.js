@@ -1,11 +1,13 @@
 import { useState, useCallback } from 'react';
 import { AnimalService } from '../services/animalService';
+import { useToast } from '../context/ToastContext';
 
 /**
  * useAnalysis handles the state and logic for animal image analysis.
  * Adheres to SRP by isolating analysis-specific logic.
  */
 export const useAnalysis = (onSuccess) => {
+  const { addToast } = useToast();
   const [analyzing, setAnalyzing] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -30,17 +32,26 @@ export const useAnalysis = (onSuccess) => {
     
     setAnalyzing(true);
     try {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64String = reader.result.split(',')[1];
-        const analysis = await AnimalService.performAnalysis(base64String, selectedImage.type);
-        setResult(analysis);
-        if (onSuccess) onSuccess();
-      };
-      reader.readAsDataURL(selectedImage);
+      const base64String = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (reader.result) {
+            resolve(reader.result.split(',')[1]);
+          } else {
+            reject(new Error("Failed to read file"));
+          }
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(selectedImage);
+      });
+
+      const analysis = await AnimalService.performAnalysis(base64String, selectedImage.type);
+      setResult(analysis);
+      addToast('Analysis completed successfully!', 'success');
+      if (onSuccess) onSuccess();
     } catch (error) {
       console.error("Analysis failed:", error);
-      alert("Something went wrong during analysis.");
+      addToast(error.message || "Analysis failed. Please try again.", 'error');
     } finally {
       setAnalyzing(false);
     }

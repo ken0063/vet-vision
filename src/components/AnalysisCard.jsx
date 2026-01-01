@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion';
 import { Dog, Loader2 } from 'lucide-react';
 
-export const AnalysisCard = ({ previewUrl, result, analyzing, onClear, onRun }) => (
+export const AnalysisCard = ({ previewUrl, result, analyzing, onClear, onRun }) => {
+  console.log(analyzing);
+  return (
   <motion.div 
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
@@ -63,7 +65,7 @@ export const AnalysisCard = ({ previewUrl, result, analyzing, onClear, onRun }) 
       </motion.div>
     )}
 
-    {!result && (
+    {/* {!result && !analyzing && ( */}
       <button 
         onClick={onRun}
         disabled={analyzing}
@@ -82,6 +84,6 @@ export const AnalysisCard = ({ previewUrl, result, analyzing, onClear, onRun }) 
           'Start AI Analysis'
         )}
       </button>
-    )}
+    {/* )} */}
   </motion.div>
-);
+)};
